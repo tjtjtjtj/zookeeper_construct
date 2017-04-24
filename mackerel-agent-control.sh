@@ -2,8 +2,8 @@
 set -o pipefail
 
 #api_keyは暗号化ファイルで管理
-image_name="mackerel/mackerel-agent"
-container_name="mackerel-agent"
+IMAGE_NAME="mackerel/mackerel-agent"
+CONTAINER_NAME="mackerel-agent"
 
 func agent_container_run(){
 docker run -h `hostname` \
@@ -13,46 +13,46 @@ docker run -h `hostname` \
     -e 'enable_docker_plugin=true' \
     -e 'auto_retirement=0' \
     -e 'opts=-v' \
-    --name ${container_name} \
+    --name ${CONTAINER_NAME} \
     --restart=always \
     -d \
     -rm \
-    ${image_name}
+    ${IMAGE_NAME}
 RETVAL=$?
-[ ${RETVAL} -eq 0 ] || echo "docker run ${container_name} failed."
+[ ${RETVAL} -eq 0 ] || echo "docker run ${CONTAINER_NAME} failed."
 return ${RETVAL}
 }
 
 func agent_container_stop(){
-docker stop ${mackerel-agent}
+docker stop ${CONTAINER_NAME}
 RETVAL=$?
-[ ${RETVAL} -eq 0 ] || echo "docker stop mackerel-agent failed."
+[ ${RETVAL} -eq 0 ] || echo "docker stop ${CONTAINER_NAME} failed."
 return ${RETVAL}
 }
 
 func agent_container_status(){
 docker inspect \
   --format="Status:{{.State.Status}} StartedAt:{{.State.StartedAt}} Image:{{.Image}}" \
-  ${container_name} | tr " " "\n"
+  ${CONTAINER_NAME} | tr " " "\n"
 RETVAL=$?
-[ ${RETVAL} -eq 0 ] || echo "docker inspect mackerel-agent failed."
+[ ${RETVAL} -eq 0 ] || echo "docker inspect ${CONTAINER_NAME} failed."
 return ${RETVAL}
 }
 
 func agent_image_delete(){
-docker images -f dangling=true  -q ${image_name} | docker rmi
+docker images -f dangling=true  -q ${IMAGE_NAME} | docker rmi
 RETVAL=$?
-[ ${RETVAL} -eq 0 ] || echo "mackerel-agent image delete failed."
+[ ${RETVAL} -eq 0 ] || echo "${CONTAINER_NAME} image delete failed."
 return ${RETVAL}
 }
 
 func agent_image_pull(){
-images_list=`docker pull ${image_name}`
+IMAGES_LIST=`docker pull ${IMAGE_NAME}`
 RETVAL=$?
-[ ${retval} -eq 0 ] || echo "docker pull failde." ; exit ${retval}
+[ ${retval} -eq 0 ] || echo "docker pull ${CONTAINER_NAME} image failed." ; exit ${retval}
 
-if echo ${images_list} | grep -q "Image is up to date"; then
-  echo "mackerel-agent image is up to date."
+if echo ${IMAGES_LIST} | grep -q "Image is up to date"; then
+  echo "${CONTAINER_NAME} image is up to date."
   exit 0
 fi
 return 0
@@ -66,6 +66,8 @@ agent_image_delete
 }
 
 argument check
+#ここで引数１個のかくにん
+
 case "$1" in
       start)
         agent_container_run
