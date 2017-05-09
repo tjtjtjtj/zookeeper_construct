@@ -68,7 +68,7 @@ agent_container_remove()
 
 agent_image_remove()
 {
-  docker images -f dangling=true -q ${IMAGE_NAME} | docker rmi
+  docker images -f dangling=true -q ${IMAGE_NAME} | xargs -r docker rmi
   RETVAL=$?
   [[ ${RETVAL} -eq 0 ]] && echo "${CONTAINER_NAME} image remove succeeded" || echo "${CONTAINER_NAME} image remove failed." 1>&2
   return ${RETVAL}
